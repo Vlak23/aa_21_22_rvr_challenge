@@ -64,6 +64,27 @@ while true:
         pass
     time.sleep(0.2)
 
+def drive(self,speed,heading):
+
+        flags = 0x00
+        speed = int(speed)
+        if speed < 0:
+            speed *= -1
+            heading += 180
+            heading %= 360
+            flags = 0x01
+
+        drive_data = [
+            0x8D, 0x3E, 0x12, 0x01, 0x16, 0x07, 0x00,
+            speed, heading >> 8, heading & 0xFF, flags
+        ]
+
+        drive_data.extend([~((sum(drive_data) - 0x8D) % 256) & 0x00FF, 0xD8])
+
+        self._uart.write(bytearray(drive_data))
+
+        return
+
 
 # Drive for two seconds at a heading of 90 degrees
 #rvr.drive(50,0)
